@@ -5,3 +5,4 @@
 - daisyui -> peu de temps
 - sentry -> handling error
 - faire un vrai infinite scroll
+- ajout cache control next pour gérer mieux les multiples changement de filters

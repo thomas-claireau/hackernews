@@ -1,12 +1,10 @@
 import Card from "@/components/Card";
 import Container from "@/components/Container";
 import Filters from "@/components/Filters";
-import Header from "@/components/Header";
-import Loading from "@/components/Loading";
-import ArrowTopSVG from "@/components/ui/ArrowTopSVG";
+import Layout from "@/components/Layout";
 import { Post } from "@/types/posts";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 type Props = {
   posts: Post[];
@@ -15,8 +13,6 @@ type Props = {
 export default function Home({ posts }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const [onTop, setOnTop] = useState(false);
   const [filters, setFilters] = useState([
     {
       name: "topstories",
@@ -27,10 +23,6 @@ export default function Home({ posts }: Props) {
       active: false,
     },
   ]);
-
-  const onScroll = useCallback(() => {
-    setScrollY(window.pageYOffset);
-  }, []);
 
   const handleFilters = useCallback(
     (e, filterName) => {
@@ -53,20 +45,6 @@ export default function Home({ posts }: Props) {
     [router]
   );
 
-  useEffect(() => {
-    window.addEventListener("scroll", onScroll);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, [onScroll]);
-
-  useEffect(() => setOnTop(scrollY > 0), [scrollY]);
-
-  useEffect(() => {
-    console.log("is loading", loading);
-  }, [loading]);
-
   const renderPosts = useMemo(() => {
     setLoading(false);
 
@@ -74,23 +52,18 @@ export default function Home({ posts }: Props) {
   }, [posts]);
 
   return (
-    <div>
-      <Header />
+    <Layout>
       <Container className="mt-8 flex flex-col items-center gap-8">
         <Filters filters={filters} onClick={handleFilters} loading={loading} />
         <div className="grid grid-cols-3 gap-4">{renderPosts}</div>
       </Container>
-
-      {onTop && (
-        <button className="btn btn-circle fixed bottom-6 right-5 ml-auto" onClick={() => window.scrollTo(0, 0)}>
-          <ArrowTopSVG />
-        </button>
-      )}
-    </div>
+    </Layout>
   );
 }
 
 async function getPostIds(type = "topstories") {
+  if (!type) type = "topstories";
+
   const res = await fetch(`https://hacker-news.firebaseio.com/v0/${type}.json?print=pretty`);
 
   return await res.json();
