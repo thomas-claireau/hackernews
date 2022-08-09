@@ -1,5 +1,6 @@
 import { useAppContext } from "@/AppContext";
 import { MouseEvent } from "react";
+import SpinnerSVG from "./ui/SpinnerSVG";
 
 type Filter = {
   name: string;
@@ -9,21 +10,24 @@ type Filter = {
 type Props = {
   filters: Filter[];
   onClick: (e: MouseEvent, filterName: string) => void;
+  loading: boolean;
 };
 
-export default function Filters({ filters, onClick }: Props) {
+export default function Filters({ filters, onClick, loading }: Props) {
   const { i18n } = useAppContext();
 
   return (
     <div className="tabs tabs-boxed">
       {filters.map((filter) => (
-        <a
+        <button
           key={filter.name}
-          className={`tab ${filter.active ? "tab-active" : ""}`}
+          className={`flex items-center gap-2 tab ${filter.active ? "tab-active" : ""}`}
           onClick={(e) => onClick(e, filter.name)}
+          disabled={loading}
         >
+          {filter.active && loading && <SpinnerSVG className="h-4 w-4 animate-spin fill-current" />}
           {i18n?.[filter.name]}
-        </a>
+        </button>
       ))}
     </div>
   );

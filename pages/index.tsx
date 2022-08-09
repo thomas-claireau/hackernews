@@ -2,6 +2,7 @@ import Card from "@/components/Card";
 import Container from "@/components/Container";
 import Filters from "@/components/Filters";
 import Header from "@/components/Header";
+import Loading from "@/components/Loading";
 import ArrowTopSVG from "@/components/ui/ArrowTopSVG";
 import { Post } from "@/types/posts";
 import { useRouter } from "next/router";
@@ -13,6 +14,7 @@ type Props = {
 
 export default function Home({ posts }: Props) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [onTop, setOnTop] = useState(false);
   const [filters, setFilters] = useState([
@@ -45,6 +47,8 @@ export default function Home({ posts }: Props) {
       router.replace({
         query: { ...router.query, type: filterName },
       });
+
+      setLoading(true);
     },
     [router]
   );
@@ -59,14 +63,22 @@ export default function Home({ posts }: Props) {
 
   useEffect(() => setOnTop(scrollY > 0), [scrollY]);
 
+  useEffect(() => {
+    console.log("is loading", loading);
+  }, [loading]);
+
+  const renderPosts = useMemo(() => {
+    setLoading(false);
+
+    return posts.map((post) => <Card key={post.id} post={post} />);
+  }, [posts]);
+
   return (
     <div>
       <Header />
       <Container className="mt-8 flex flex-col items-center gap-8">
-        <Filters filters={filters} onClick={handleFilters} />
-        <div className="grid grid-cols-3 gap-4">
-          {useMemo(() => posts.map((post) => <Card key={post.id} post={post} />), [posts])}
-        </div>
+        <Filters filters={filters} onClick={handleFilters} loading={loading} />
+        <div className="grid grid-cols-3 gap-4">{renderPosts}</div>
       </Container>
 
       {onTop && (
