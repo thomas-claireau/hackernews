@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { AppContextProvider } from "../AppContext";
 import "../styles/globals.css";
+import { ThemeProvider } from "next-themes";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -18,9 +19,9 @@ function MyApp({ Component, pageProps }) {
           <link key={lang} rel="alternate" hrefLang={lang} href={`/${lang}`} />
         ))}
       </Head>
-      <div className="dark:bg-dark dark:text-light">
+      <ThemeProvider defaultTheme="dracula">
         <Component {...pageProps} />
-      </div>
+      </ThemeProvider>
     </AppContextProvider>
   );
 }
