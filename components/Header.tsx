@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Container from "./Container";
+import ThemeChanger from "./ThemeChanger";
 import GithubSVG from "./ui/GithubSVG";
 
 export default function Header() {
@@ -14,8 +15,9 @@ export default function Header() {
             </a>
           </Link>
         </div>
-        <div className="flex-none normal-case text-2xl">
-          <GithubSVG className="h-6 w-6" />
+        <div className="flex-none gap-4 normal-case text-2xl">
+          <ThemeChanger />
+          <GithubSVG className="h-6 w-6 fill-current" />
         </div>
       </Container>
     </div>
