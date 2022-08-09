@@ -4,3 +4,4 @@
 - next-seo
 - daisyui -> peu de temps
 - sentry -> handling error
+- faire un vrai infinite scroll
