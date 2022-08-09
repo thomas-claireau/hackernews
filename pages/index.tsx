@@ -4,7 +4,6 @@ import Filters from "@/components/Filters";
 import Header from "@/components/Header";
 import ArrowTopSVG from "@/components/ui/ArrowTopSVG";
 import { Post } from "@/types/posts";
-import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Props = {
@@ -12,7 +11,6 @@ type Props = {
 };
 
 export default function Home({ posts }: Props) {
-  const router = useRouter();
   const [scrollY, setScrollY] = useState(0);
   const [onTop, setOnTop] = useState(false);
   const [filters, setFilters] = useState([
@@ -30,24 +28,17 @@ export default function Home({ posts }: Props) {
     setScrollY(window.pageYOffset);
   }, []);
 
-  const handleFilters = useCallback(
-    (e, filterName) => {
-      const elt = e.currentTarget;
-      if (elt.classList.contains("tab-active")) return;
+  const handleFilters = useCallback((e, filterName) => {
+    const elt = e.currentTarget;
+    if (elt.classList.contains("tab-active")) return;
 
-      setFilters((prevFilters) =>
-        prevFilters.map((filter) => ({
-          name: filter.name,
-          active: filter.name === filterName,
-        }))
-      );
-
-      router.replace({
-        query: { ...router.query, type: filterName },
-      });
-    },
-    [router]
-  );
+    setFilters((prevFilters) =>
+      prevFilters.map((filter) => ({
+        name: filter.name,
+        active: filter.name === filterName,
+      }))
+    );
+  }, []);
 
   useEffect(() => {
     window.addEventListener("scroll", onScroll);
@@ -78,27 +69,22 @@ export default function Home({ posts }: Props) {
   );
 }
 
-async function getPostIds(type = "topstories") {
-  const res = await fetch(`https://hacker-news.firebaseio.com/v0/${type}.json?print=pretty`);
+async function getPostIds() {
+  const res = await fetch(`https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty`);
 
   return await res.json();
 }
 
-export async function getServerSideProps({ res, query }) {
-  let posts = [];
-  const { type } = query;
-  const postIds = await getPostIds(type);
+export async function getServerSideProps() {
+  const postIds = await getPostIds();
 
-  if (postIds.length)
-    posts = await Promise.all(
-      postIds.map(async (postId) => {
-        const res = await fetch(`https://hacker-news.firebaseio.com/v0/item/${postId}.json?print=pretty`);
+  const posts = await Promise.all(
+    postIds.map(async (postId) => {
+      const res = await fetch(`https://hacker-news.firebaseio.com/v0/item/${postId}.json?print=pretty`);
 
-        return res.json();
-      })
-    );
-
-  res.setHeader("Cache-Control", "public, s-maxage=10, stale-while-revalidate=59");
+      return res.json();
+    })
+  );
 
   return { props: { posts } };
 }
