@@ -8,13 +8,13 @@ export default function Header() {
       <Container className="navbar">
         <div className="flex-1">
           <Link href="/">
-            <a className="btn btn-ghost normal-case text-2xl">
+            <a className="normal-case font-bold text-2xl">
               hacker
               <span className="text-secondary">news</span>
             </a>
           </Link>
         </div>
-        <div className="flex-none btn btn-ghost normal-case text-2xl">
+        <div className="flex-none normal-case text-2xl">
           <GithubSVG className="h-6 w-6" />
         </div>
       </Container>
