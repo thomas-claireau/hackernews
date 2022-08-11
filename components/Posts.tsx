@@ -1,3 +1,4 @@
+import { Post } from "@/types/posts";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -5,7 +6,15 @@ import Card from "./Card";
 import Container from "./Container";
 import InfiniteLoader from "./InfiniteLoader";
 
-export default function Posts({ data, isFilter = false, setIsFilter = undefined }) {
+type Props = {
+  className?: string;
+  data: Post[];
+  isFilter?: boolean;
+  setIsFilter?: React.Dispatch<React.SetStateAction<boolean>>;
+  hasMore: boolean;
+};
+
+export default function Posts({ className, data, isFilter = false, setIsFilter = undefined, hasMore }: Props) {
   const router = useRouter();
   const [posts, setPosts] = useState([]);
 
@@ -40,10 +49,10 @@ export default function Posts({ data, isFilter = false, setIsFilter = undefined 
 
   return (
     <InfiniteScroll
-      className="mt-8 relative !overflow-hidden"
+      className={`${className} mt-8 relative !overflow-hidden`}
       dataLength={posts.length} //This is important field to render the next data
       next={fetchData}
-      hasMore={true}
+      hasMore={hasMore}
       loader={<InfiniteLoader />}
       endMessage={
         <p style={{ textAlign: "center" }}>

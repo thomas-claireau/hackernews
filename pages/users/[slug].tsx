@@ -1,17 +1,38 @@
+import { useAppContext } from "@/AppContext";
 import Container from "@/components/Container";
-import Filters from "@/components/Filters";
 import Layout from "@/components/Layout";
 import Posts from "@/components/Posts";
+import StarSVG from "@/components/ui/StarSVG";
 import { getData } from "@/lib/pages";
+import { Post } from "@/types/posts";
+import { HnUser } from "@/types/hnUser";
 
-export default function User({ user, data }) {
-  console.log(user);
-  console.log(data);
+type Props = {
+  user: HnUser;
+  data: Post[];
+  hasMore: boolean;
+};
+
+export default function User({ user, data, hasMore }: Props) {
+  const { i18n } = useAppContext();
+  const date = new Date(user.created * 1000);
 
   return (
     <Layout>
-      {/* <Container className="mt-8 flex flex-col items-center gap-8"></Container> */}
-      <Posts data={data} />
+      <Container className="mt-12 flex flex-col gap-8">
+        <div className="flex items-center justify-between">
+          <h1 className="text-7xl font-bold">{`@${user?.id}`}</h1>
+          <div className="flex flex-col gap-2 items-end">
+            <div className="flex items-center gap-2 text-2xl">
+              <StarSVG className="h-6 w-6 stroke-current" />
+              {user?.karma}
+            </div>
+            <div className="text-base-content/70 ">{`${i18n?.since} ${date.toLocaleDateString()}`}</div>
+          </div>
+        </div>
+        <div className="text-base-content/70 text-2xl">{user?.about}</div>
+      </Container>
+      <Posts className="mt-12" data={data} hasMore={hasMore} />
     </Layout>
   );
 }
@@ -23,5 +44,7 @@ export async function getServerSideProps({ res, query }) {
 
   res.setHeader("Cache-Control", "public, s-maxage=10, stale-while-revalidate=59");
 
-  return { props: { user, data: await getData(submittedPostIds, query) } };
+  const [data, hasMore] = await getData(submittedPostIds, query);
+
+  return { props: { user, data, hasMore } };
 }

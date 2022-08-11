@@ -2,4 +2,5 @@
 export default {
   topstories: "Top Stories",
   newstories: "New Stories",
+  since: "Since",
 };

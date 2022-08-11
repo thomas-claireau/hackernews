@@ -8,9 +8,10 @@ import { useState } from "react";
 
 type Props = {
   data: Post[];
+  hasMore: boolean;
 };
 
-export default function Home({ data }: Props) {
+export default function Home({ data, hasMore }: Props) {
   const [isFilter, setIsFilter] = useState(false);
 
   return (
@@ -18,7 +19,7 @@ export default function Home({ data }: Props) {
       <Container className="mt-8 flex flex-col items-center gap-8">
         <Filters loading={isFilter} setIsFilter={setIsFilter} />
       </Container>
-      <Posts data={data} isFilter={isFilter} setIsFilter={setIsFilter} />
+      <Posts data={data} isFilter={isFilter} setIsFilter={setIsFilter} hasMore={hasMore} />
     </Layout>
   );
 }
@@ -37,5 +38,7 @@ export async function getServerSideProps({ res, query }) {
 
   res.setHeader("Cache-Control", "public, s-maxage=10, stale-while-revalidate=59");
 
-  return { props: { data: await getData(postIds, query) } };
+  const [data, hasMore] = await getData(postIds, query);
+
+  return { props: { data, hasMore } };
 }
