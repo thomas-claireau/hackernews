@@ -12,7 +12,7 @@ export default function Card({ post }: Props) {
   // console.log(post);
 
   return (
-    <div className="card w-full bg-base-200 shadow-xl">
+    <div className="card w-full bg-base-300 shadow-xl">
       <div className="card-body justify-between">
         <div className="flex justify-between">
           <div className="text-base-content/70 text-sm">

@@ -1,18 +1,22 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Card from "@/components/Card";
 import Container from "@/components/Container";
 import Filters from "@/components/Filters";
+import InfiniteLoader from "@/components/InfiniteLoader";
 import Layout from "@/components/Layout";
 import { Post } from "@/types/posts";
 import { useRouter } from "next/router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 type Props = {
-  posts: Post[];
+  data: Post[];
 };
 
-export default function Home({ posts }: Props) {
+export default function Home({ data }: Props) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [isFilter, setIsFilter] = useState(false);
   const [filters, setFilters] = useState([
     {
       name: "topstories",
@@ -36,27 +40,67 @@ export default function Home({ posts }: Props) {
         }))
       );
 
-      router.replace({
-        query: { ...router.query, type: filterName },
-      });
+      router.push(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, page: 1, type: filterName },
+        },
+        router.pathname
+      );
 
-      setLoading(true);
+      setIsFilter(true);
     },
     [router]
   );
 
   const renderPosts = useMemo(() => {
-    setLoading(false);
+    setIsFilter(false);
 
     return posts.map((post) => <Card key={post.id} post={post} />);
   }, [posts]);
 
+  const fetchData = () => {
+    setTimeout(() => {
+      const page = ~~router.query.page ? ~~router.query.page : 1;
+
+      router.push(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, page: page + 1 },
+        },
+        router.pathname,
+        { scroll: false }
+      );
+    }, 500);
+  };
+
+  useEffect(() => {
+    if (!isFilter) {
+      setPosts((prevPosts) => [...prevPosts, ...data]);
+    } else {
+      setPosts(() => [...data]);
+    }
+  }, [data]);
+
   return (
     <Layout>
       <Container className="mt-8 flex flex-col items-center gap-8">
-        <Filters filters={filters} onClick={handleFilters} loading={loading} />
-        <div className="grid grid-cols-3 gap-4">{renderPosts}</div>
+        <Filters filters={filters} onClick={handleFilters} loading={isFilter} />
       </Container>
+      <InfiniteScroll
+        className="mt-8 relative !overflow-hidden"
+        dataLength={posts.length} //This is important field to render the next data
+        next={fetchData}
+        hasMore={true}
+        loader={<InfiniteLoader />}
+        endMessage={
+          <p style={{ textAlign: "center" }}>
+            <b>Yay! You have seen it all</b>
+          </p>
+        }
+      >
+        <Container className="grid grid-cols-3 gap-4">{renderPosts}</Container>
+      </InfiniteScroll>
     </Layout>
   );
 }
@@ -70,13 +114,17 @@ async function getPostIds(type = "topstories") {
 }
 
 export async function getServerSideProps({ res, query }) {
-  let posts = [];
+  let data = [];
   const { type } = query;
+
   const postIds = await getPostIds(type);
 
+  const page = ~~query.page ? ~~query.page : 1;
+  const nbItems = 21;
+
   if (postIds.length)
-    posts = await Promise.all(
-      postIds.map(async (postId) => {
+    data = await Promise.all(
+      postIds.slice(nbItems * (page - 1), nbItems * page).map(async (postId) => {
         const res = await fetch(`https://hacker-news.firebaseio.com/v0/item/${postId}.json?print=pretty`);
 
         return res.json();
@@ -85,5 +133,5 @@ export async function getServerSideProps({ res, query }) {
 
   res.setHeader("Cache-Control", "public, s-maxage=10, stale-while-revalidate=59");
 
-  return { props: { posts } };
+  return { props: { data } };
 }
