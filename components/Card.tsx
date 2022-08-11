@@ -9,8 +9,6 @@ type Props = {
 export default function Card({ post }: Props) {
   const date = new Date(post.time * 1000);
 
-  // console.log(post);
-
   return (
     <div className="card w-full bg-base-300 shadow-xl">
       <div className="card-body justify-between">
