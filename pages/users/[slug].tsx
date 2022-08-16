@@ -44,7 +44,7 @@ export async function getServerSideProps({ res, query }) {
 
   res.setHeader("Cache-Control", "public, s-maxage=10, stale-while-revalidate=59");
 
-  const [data, hasMore] = await getData(submittedPostIds, query);
+  const [data, hasMore] = await getData(submittedPostIds, false);
 
   return { props: { user, data, hasMore } };
 }
