@@ -1,11 +1,15 @@
-export const getData = async (postIds, query) => {
+export const getData = async (postIds: number[], query: { page: number } | false) => {
   let hasMore = true;
   let data = [];
-  const nbItems = 21;
-  const page = ~~query.page ? ~~query.page : 1;
+  let selectedPostIds = postIds;
 
   if (postIds.length) {
-    const selectedPostIds = postIds.slice(nbItems * (page - 1), nbItems * page);
+    if (query) {
+      const nbItems = 21;
+      const page = ~~query.page ? ~~query.page : 1;
+
+      selectedPostIds = postIds.slice(nbItems * (page - 1), nbItems * page);
+    }
 
     data = await filterPost(selectedPostIds);
 
@@ -27,6 +31,7 @@ async function filterPost(selectedPostIds) {
   );
 
   return responses.filter((response) => {
-    return response?.title ? response : false;
+    return response.type == "story" ? response : false;
+    // return response?.title ? response : false;
   });
 }
