@@ -54,13 +54,8 @@ export default function Posts({ className, data, isFilter = false, setIsFilter =
       next={fetchData}
       hasMore={hasMore}
       loader={<InfiniteLoader />}
-      endMessage={
-        <p style={{ textAlign: "center" }}>
-          <b>Yay! You have seen it all</b>
-        </p>
-      }
     >
-      <Container className="grid grid-cols-3 gap-4">{renderPosts}</Container>
+      <Container className="grid grid-cols-1 gap-4 pb-8 md:grid-cols-2 lg:grid-cols-3">{renderPosts}</Container>
     </InfiniteScroll>
   );
 }

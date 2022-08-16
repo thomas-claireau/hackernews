@@ -20,9 +20,9 @@ export default function User({ user, data, hasMore }: Props) {
   return (
     <Layout>
       <Container className="mt-12 flex flex-col gap-8">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start flex-col gap-8 justify-between md:flex-row md:items-center">
           <h1 className="text-7xl font-bold">{`@${user?.id}`}</h1>
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex gap-4 items-center md:flex-col md:items-end md:gap-2">
             <div className="flex items-center gap-2 text-2xl">
               <StarSVG className="h-6 w-6 stroke-current" />
               {user?.karma}
